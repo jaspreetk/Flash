@@ -88,17 +88,17 @@ int StripSuffix(char *string, char *suffix);
 int ReadSummaryFile(char *prefixName, int maxFiles, int sizes[], int reqs[]);
 
 #if defined(_STDIO_H_) || defined(_STDIO_H) || defined(_H_STDIO)
-FILE *OpenTraceFile(char *prefixName);
-void CloseTraceFile(FILE *trace);
-FILE *OpenAnyFile(char *filename);
-void CloseAnyFile(FILE *f);
+	FILE *OpenTraceFile(char *prefixName);
+	void CloseTraceFile(FILE *trace);
+	FILE *OpenAnyFile(char *filename);
+	void CloseAnyFile(FILE *f);
 #endif
 
 #ifndef TRUE
-#define TRUE 1
+	#define TRUE 1
 #endif
 
 #ifndef FALSE
-#define FALSE 0
+	#define FALSE 0
 #endif
 

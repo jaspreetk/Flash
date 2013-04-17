@@ -83,7 +83,7 @@ accordance with the requirements of that license:
 #include <errno.h>
 #include <fcntl.h>
 #ifdef HAVE_MEMORY_H
-#include <memory.h>
+	#include <memory.h>
 #endif
 #include <pwd.h>
 #include <signal.h>
@@ -175,11 +175,11 @@ ChildHandler(int sig)
   
   /* Reap defunct children until there aren't any more. */
   for (;;) {
-#ifdef HAVE_WAITPID
+  #ifdef HAVE_WAITPID
     pid = waitpid(-1, &status, WNOHANG);
-#else /* HAVE_WAITPID */
+  #else /* HAVE_WAITPID */
     pid = wait3(&status, WNOHANG, NULL);
-#endif /* HAVE_WAITPID */
+  #endif /* HAVE_WAITPID */
     if (!pid)			/* none left */
       break;
     if (pid < 0) {

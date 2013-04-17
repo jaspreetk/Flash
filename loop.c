@@ -114,6 +114,7 @@ static void FlushAccessLog(void);
 void
 InitFDSets(void)
 {
+  /* initializes a descriptor set masterReadFDSet & masterWriteFDSetto the null set. */
   FD_ZERO(&masterReadFDSet);
   FD_ZERO(&masterWriteFDSet);
 }
@@ -256,6 +257,7 @@ ReenableNewClients(void)
 void 
 MainLoop(void)
 {
+	puts("Just checking");
   fd_set rfdset;
   fd_set wfdset;
   int r;

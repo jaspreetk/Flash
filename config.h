@@ -187,7 +187,7 @@ accordance with the requirements of that license:
 ** initializing.  If this user (or the one specified by the -u flag) does
 ** not exist, the program will refuse to run.
 */
-#define DEFAULT_USER "nobody"
+#define DEFAULT_USER "root"
 
 /* CONFIGURE: When started as root, the program can automatically chdir()
 ** to the home directory of the user specified by -u or DEFAULT_USER.

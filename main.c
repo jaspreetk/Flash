@@ -86,7 +86,7 @@ accordance with the requirements of that license:
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
-#include <pwd.h>
+#include <pwd.h>			/* for the struct passwd */
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -140,25 +140,35 @@ static char *maxSlaveIdleTimeStr = "30"; /* see config.h */
 #endif
 int maxSlaveIdleTime;
 
-static char *bindPortStr = DEFAULT_PORTSTR;
+/*
+ * The DEFAULT_PORTSTR is defined in config.h
+ * It is set to port number 80, it can be changed from the command line
+ * 
+*/
+static char *bindPortStr = DEFAULT_PORTSTR;	/* see config.h */
 
+/* This is the directory containing files to be served
+ * You will have to modify the directory
+ * You can do it either here or via command line
+*/
 static char *docDirStr = NULL;
 
 #ifdef ALWAYS_CHROOT
-static char *doChrootStr = "1";
+	static char *doChrootStr = "1";
 #else
-static char *doChrootStr = "0";
+	static char *doChrootStr = "0";
 #endif
 
-static char *serverUserStr = DEFAULT_USER;
+/* The Default User is "nobody" */
+static char *serverUserStr = DEFAULT_USER;		/* config.h */
 
 #ifdef CGI_PATTERN
-static char *cgiPatternStr = CGI_PATTERN;
+	static char *cgiPatternStr = CGI_PATTERN;
 #else
-static char *cgiPatternStr = NULL;
+	static char *cgiPatternStr = NULL;
 #endif
 
-static char *hostnameStr = NULL;
+static char *hostnameStr = "33125";
 
 static char *slaveDelayTimeStr = "1"; /* see config.h */
 int slaveDelayTime;
@@ -181,6 +191,11 @@ int accessLoggingEnabled;
 static char *numFlashProcsStr = "1"; /* number of main processes */
 static int numFlashProcs;
 
+/*
+ * This array is passed to the function, ScanOptions() defined in the file common.h 
+ * The function reads from the command line and sets the values of the below mentioned fields
+ * 
+*/
 StringOptions stringOptions[] = {
   {"-lrusize", &lruCacheMBStr, "if nonzero, heuristic LRU data cache size in MB"},
   {"-readhelp", &maxReadHelpStr, "max # of read helper processes per main proc"},
@@ -233,8 +248,11 @@ ShutDown(void)
   int cnum;
   
   for (cnum = 0; cnum < maxConnects; ++cnum)
+  {
+	  puts("Calling?");
     if (!ISCONNFREE(cnum))
       DoneWithConnection(allConnects[cnum], TRUE);
+  }
   KillAllFreeCGISocks();
   HttpdTerminate();
 }
@@ -255,13 +273,13 @@ main(int argc, char** argv)
   int port;
   int do_chroot;
   struct passwd* pwd;
-  uid_t uid;
-  gid_t gid;
+  uid_t uid;			/* User ID */
+  gid_t gid;			/* Group ID */
   char cwd[MAXPATHLEN];
   int nfiles;
   int i;
 
-  systemPageSizeBits = systemPageSize = getpagesize();
+  systemPageSizeBits = systemPageSize = getpagesize();		/* Returns the size of a page, fixed in nature */
   for (i = 0; ; i++) {
     if (systemPageSizeBits <= 1) {
       systemPageSizeBits = i;
@@ -270,7 +288,14 @@ main(int argc, char** argv)
     systemPageSizeBits >>= 1;
   }
   
-  ScanOptions(argc, argv, 1, stringOptions);
+  
+  /* 
+   * The function takes input from the command line and update the data as per requirement.
+   * It also checks for any error cases such as wrong input or missing input.
+   * In case of no input, it assumes default values 
+  */
+  ScanOptions(argc, argv, 1, stringOptions);			/* The function is defined in common.c */
+  
   port = atoi(bindPortStr);
   do_chroot = atoi(doChrootStr);
   maxLRUCacheSizeBytes = 1024*1024*atoi(lruCacheMBStr);
@@ -286,17 +311,28 @@ main(int argc, char** argv)
   doMincoreDump = atoi(doMincoreDumpStr);
   maxNameCacheSize = atoi(nameCacheSizeStr);
   maxSlaveIdleTime = atoi(maxSlaveIdleTimeStr);
+  
   if (maxSlaveIdleTime < 0)
     maxSlaveIdleTime = 0;
+  
   numFlashProcs = atoi(numFlashProcsStr);
   if (numFlashProcs < 1)
     numFlashProcs = 1;
 
-  /* sets up logging if needed */
+  /*
+   *  sets up logging if needed 
+   *  The function is defined in loop.c
+  */
   SetUpAccessLogging(accessLogName);
+  
+  /* The below statements are simply validating the input data, and correcting it wherever possible. */
 
   if (maxLRUCacheSizeBytes < 0)
-    Panic("cannot have negative lru size");
+    Panic("cannot have negative lru size");			
+    /* 
+     * The function Panic() is defined in common.h 
+     * which calls PanicBack defined in common.c 
+    */
   
   if (maxReadHelp < 1 || maxConvHelp < 1 || maxDirHelp < 1)
     Panic("must allow at least one of each helper");
@@ -323,10 +359,14 @@ main(int argc, char** argv)
     cp = argv0;
   
   signal(SIGINT, HandleKill);
+  puts("Reached Here?1");
   signal(SIGTERM, HandleKill);
+  puts("Reached Here?2");
   signal(SIGPIPE, SIG_IGN);		/* get EPIPE instead */
+  puts("Reached Here?3");
   
-  InitFDSets();
+  /* initializes a descriptor set masterReadFDSet & masterWriteFDSetto the null set. */
+  InitFDSets();   /* Defined in loop.c */
 
   /* Check port number. */
   if (port <= 0) {
@@ -334,7 +374,7 @@ main(int argc, char** argv)
     exit(1);
   }
   
-  /* Figure out uid/gid from user. */
+  /* Figure out uid/gid from user. The default user defined is "nobody"*/
   pwd = getpwnam(serverUserStr);
   if (pwd == (struct passwd*) 0) {
     fprintf(stderr, "unknown user - '%s'\n", serverUserStr);
@@ -342,6 +382,11 @@ main(int argc, char** argv)
   }
   uid = pwd->pw_uid;
   gid = pwd->pw_gid;
+  printf("%d\n", uid );
+  printf("%d\n", gid );
+  printf("%s\n", pwd->pw_name );
+  printf("%s\n", pwd->pw_dir );
+  printf("%s\n", pwd->pw_shell );
   
   /* figure out absolute pathname for this program */
   if (argv[0][0] == '/')
@@ -355,16 +400,19 @@ main(int argc, char** argv)
       strcat(cwd, "/");
     strcat(cwd, argv[0]);
   }
+  
 
   /* strip program name - inefficient but who cares */
   while (strlen(cwd) && cwd[strlen(cwd) - 1] != '/')
     cwd[strlen(cwd) - 1] = 0;
+  printf("%s\n", cwd );
 
   /* Initialize the HTTP layer.  Got to do this before giving up root,
    ** so that we can bind to a privileged port.
    */
   if (HttpdInitialize(hostnameStr, port, cgiPatternStr, cwd))
     exit(1);
+   printf("this is here %s\n", hostnameStr);
   
   /* Switch directories if requested. */
   if (docDirStr != (char*) 0) {
@@ -375,6 +423,7 @@ main(int argc, char** argv)
   }
 
 #ifdef USE_USER_DIR
+  /* Will have to configure this to use it */
   else if (getuid() == 0) {
     /* No explicit directory was specified, we're root, and the
      ** USE_USER_DIR option is set - switch to the specified user's
@@ -399,6 +448,7 @@ main(int argc, char** argv)
   }
   
   /* start the slaves _after_ changing the application directory */
+  /* Doubt? Where are we changing the application directory ? */
   InitConvertSlaves(cwd);
   InitAsyncReadSlaves(cwd);
   InitDirSlaves(cwd);
@@ -417,7 +467,10 @@ main(int argc, char** argv)
     strcpy(cwd, "/");
   }
   
-  if (! debug) {
+  /* 
+   * Debugging 
+   */
+  if (!debug) {
     /* We're not going to use stdin stdout or stderr from here on, so close
      ** them to save file descriptors.
      */
@@ -457,7 +510,7 @@ main(int argc, char** argv)
     if (!do_chroot)
       fprintf(stderr, 
 	      "started as root without requesting chroot(), warning only\n");
-  }
+  } /* Debugging ends here */
 
   /* Figure out how many file descriptors we can use. */
   nfiles = MIN(HttpdGetNFiles(), FD_SETSIZE);
@@ -476,6 +529,7 @@ main(int argc, char** argv)
 
   gettimeofday(&globalTimeOfDay, (struct timezone*) 0);
 
+ 
   InitConnectStates(maxConnects, HS.fd);
 
   lastTimerCheckTime = globalTimeOfDay.tv_sec;

@@ -108,6 +108,7 @@ InitConvertSlaves(char *cwd)
   if (!helperInfo)
     Panic("out of memory initing conv slaves");
 
+  /* The below function is concatenating cwd with convert_slave */
   sprintf(convSlaveName, "%s%s", cwd, "convert_slave");
 
   if (initConvHelp) {

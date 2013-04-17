@@ -79,7 +79,8 @@ typedef void TimerFunc(struct httpd_conn *);
 struct CacheEntry;
 struct HeaderInfoStruct;
 
-typedef struct httpd_conn {
+typedef struct httpd_conn 
+{
   int hc_cnum;
   struct in_addr hc_clientAddr;
   int hc_method;
