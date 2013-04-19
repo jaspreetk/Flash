@@ -1,0 +1,50 @@
+accept.c:      SetSelectHandler(newConnFD, DoConnReading, SSH_READ);
+convert_master.c:	SetSelectHandler(fd, HelperGoneIdle, SSH_READ);
+convert_master.c:  SetSelectHandler(helperInfo[pos].hi_fd, CurrentReaderDone, SSH_READ);
+convert_master.c:  SetSelectHandler(fd, NULL, SSH_NOTHING);
+convert_master.c:  SetSelectHandler(fd, HelperGoneIdle, SSH_READ);
+convert_master.c:  SetSelectHandler(hc->hc_fd, NULL, SSH_NOTHING);
+read_master.c:	SetSelectHandler(fd, HelperGoneIdle, SSH_READ);
+read_master.c:  SetSelectHandler(helperInfo[pos].hi_fd, CurrentReaderDone, SSH_READ);
+read_master.c:  SetSelectHandler(fd, NULL, SSH_NOTHING);
+read_master.c:  SetSelectHandler(fd, HelperGoneIdle, SSH_READ);
+read_master.c:  SetSelectHandler(hc->hc_fd, NULL, SSH_NOTHING);
+Binary file flash matches
+loop.h:typedef int (*SelectHandler)(struct httpd_conn *c, 
+loop.h:void SetSelectHandler(int fd, SelectHandler s, int forRW);
+dir_master.c:	SetSelectHandler(fd, HelperGoneIdle, SSH_READ);
+dir_master.c:  SetSelectHandler(helperInfo[pos].hi_fd, CurrentReaderDone, SSH_READ);
+dir_master.c:  SetSelectHandler(helperInfo[pos].hi_fd, NULL, SSH_NOTHING);
+dir_master.c:  SetSelectHandler(helperInfo[pos].hi_fd, HelperGoneIdle, SSH_READ);
+dir_master.c:    SetSelectHandler(fd, NULL, SSH_NOTHING);
+dir_master.c:    SetSelectHandler(helperInfo[pos].hi_fd, ConsumeHelperStream, SSH_READ);
+dir_master.c:  SetSelectHandler(hc->hc_fd, WriteStreamToClient, SSH_WRITE);
+dir_master.c:  SetSelectHandler(fd, NULL, SSH_NOTHING);
+dir_master.c:  SetSelectHandler(fd, ConsumeHelperStream, SSH_READ);
+dir_master.c:  SetSelectHandler(hc->hc_fd, NULL, SSH_NOTHING);
+Binary file convert_master.o matches
+Binary file accept.o matches
+cgi.c:    SetSelectHandler(fs->fs_fd, NULL, SSH_NOTHING);
+cgi.c:  SetSelectHandler(temp->fs_fd, IdleSockHandler, SSH_READ);
+cgi.c:    SetSelectHandler(c->hc_fd, WriteToClient, SSH_WRITE);
+cgi.c:      SetSelectHandler(fd, ReadWriteHandler, SSH_READ);
+cgi.c:      SetSelectHandler(fd, ReadWriteHandler, SSH_WRITE | SSH_READ);
+cgi.c:      SetSelectHandler(fd, ReadWriteHandler, SSH_READ);
+cgi.c:  SetSelectHandler(fd, WriteEnvHandler, SSH_WRITE);
+cgi.c:    SetSelectHandler(sock, WriteEnvHandler, SSH_WRITE);
+cgi.c:  SetSelectHandler(fd, NULL, SSH_NOTHING);
+cgi.c:    SetSelectHandler(fs->fs_fd, WriteEnvHandler, SSH_WRITE);
+cgi.c:  SetSelectHandler(cg->cgi_fs->fs_fd, ChildReadHandler, SSH_READ);
+Binary file cgi.o matches
+Binary file hotfile.o matches
+Binary file dir_master.o matches
+hotfile.c:  SetSelectHandler(c->hc_fd, DoSingleWrite, SSH_WRITE);
+Binary file read_master.o matches
+loop.c:SelectHandler allHandlers[FD_SETSIZE];
+loop.c:		SelectHandler handler;
+loop.c:  SetSelectHandler(fd, DoSingleWrite, SSH_WRITE);
+loop.c:    SetSelectHandler(fd, NULL, SSH_NOTHING);
+loop.c:    SetSelectHandler(c->hc_fd, NULL, SSH_NOTHING);
+loop.c:    SetSelectHandler(c->hc_fd, DoConnReading, SSH_READ);
+loop.c:SetSelectHandler(int fd, SelectHandler s, int forRW)
+Binary file loop.o matches

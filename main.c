@@ -142,7 +142,7 @@ int maxSlaveIdleTime;
 
 /*
  * The DEFAULT_PORTSTR is defined in config.h
- * It is set to port number 80, it can be changed from the command line
+ * It is set to port number 180000, it can be changed from the command line
  * 
 */
 static char *bindPortStr = DEFAULT_PORTSTR;	/* see config.h */
@@ -151,7 +151,7 @@ static char *bindPortStr = DEFAULT_PORTSTR;	/* see config.h */
  * You will have to modify the directory
  * You can do it either here or via command line
 */
-static char *docDirStr = NULL;
+static char *docDirStr = "Files";
 
 #ifdef ALWAYS_CHROOT
 	static char *doChrootStr = "1";
@@ -185,7 +185,7 @@ int doMincoreDump;
 static char *nameCacheSizeStr = "6000";	/* see config.h */
 int maxNameCacheSize;
 
-static char *accessLogName = "-";
+static char *accessLogName = "log.txt";
 int accessLoggingEnabled;
 
 static char *numFlashProcsStr = "1"; /* number of main processes */
@@ -247,9 +247,7 @@ ShutDown(void)
 {
   int cnum;
   
-  for (cnum = 0; cnum < maxConnects; ++cnum)
-  {
-	  puts("Calling?");
+  for (cnum = 0; cnum < maxConnects; ++cnum){
     if (!ISCONNFREE(cnum))
       DoneWithConnection(allConnects[cnum], TRUE);
   }
@@ -359,11 +357,8 @@ main(int argc, char** argv)
     cp = argv0;
   
   signal(SIGINT, HandleKill);
-  puts("Reached Here?1");
   signal(SIGTERM, HandleKill);
-  puts("Reached Here?2");
   signal(SIGPIPE, SIG_IGN);		/* get EPIPE instead */
-  puts("Reached Here?3");
   
   /* initializes a descriptor set masterReadFDSet & masterWriteFDSetto the null set. */
   InitFDSets();   /* Defined in loop.c */
@@ -382,11 +377,7 @@ main(int argc, char** argv)
   }
   uid = pwd->pw_uid;
   gid = pwd->pw_gid;
-  printf("%d\n", uid );
-  printf("%d\n", gid );
-  printf("%s\n", pwd->pw_name );
-  printf("%s\n", pwd->pw_dir );
-  printf("%s\n", pwd->pw_shell );
+
   
   /* figure out absolute pathname for this program */
   if (argv[0][0] == '/')
@@ -405,14 +396,13 @@ main(int argc, char** argv)
   /* strip program name - inefficient but who cares */
   while (strlen(cwd) && cwd[strlen(cwd) - 1] != '/')
     cwd[strlen(cwd) - 1] = 0;
-  printf("%s\n", cwd );
 
   /* Initialize the HTTP layer.  Got to do this before giving up root,
    ** so that we can bind to a privileged port.
    */
   if (HttpdInitialize(hostnameStr, port, cgiPatternStr, cwd))
     exit(1);
-   printf("this is here %s\n", hostnameStr);
+   
   
   /* Switch directories if requested. */
   if (docDirStr != (char*) 0) {
@@ -446,12 +436,14 @@ main(int argc, char** argv)
       break;
     }
   }
+ 
   
   /* start the slaves _after_ changing the application directory */
   /* Doubt? Where are we changing the application directory ? */
   InitConvertSlaves(cwd);
   InitAsyncReadSlaves(cwd);
   InitDirSlaves(cwd);
+  
 
   /* Get current directory. */
   getcwd(cwd, sizeof(cwd));
@@ -466,7 +458,6 @@ main(int argc, char** argv)
     }
     strcpy(cwd, "/");
   }
-  
   /* 
    * Debugging 
    */
@@ -493,7 +484,7 @@ main(int argc, char** argv)
     /* for some reason, we're getting a weird bug if we
        leave either of these open. Stderr seems unaffected */
     fclose(stdin);
-    fclose(stdout);
+    //fclose(stdout);
   }
   
   /* If we're root, try to become someone else. */
@@ -529,11 +520,14 @@ main(int argc, char** argv)
 
   gettimeofday(&globalTimeOfDay, (struct timezone*) 0);
 
- 
+  /* Initializing the connectionn state.
+   * setting the free bits to 32
+   * setting the mapping from conn to fd as -2
+   * Defined as static function in the same file
+  */ 
   InitConnectStates(maxConnects, HS.fd);
 
   lastTimerCheckTime = globalTimeOfDay.tv_sec;
-
   MainLoop();
 
   return(0);			/* will never reach here */

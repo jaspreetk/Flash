@@ -231,11 +231,13 @@ HttpdInitialize(char* hostname, int port, char* cgi_pattern, char* cwd)
   /* Set up child-process reaper. */
   signal(SIGCHLD, ChildHandler);
   
+  printf("%d\n", hostname);
   if (!hostname)
     HS.hostname = NULL;
   else
     HS.hostname = strdup(hostname);
   HS.port = port;
+  printf("%d\n", port);
   if (!cgi_pattern)
     HS.cgi_pattern = NULL;
   else {

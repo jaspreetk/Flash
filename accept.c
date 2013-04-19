@@ -138,6 +138,9 @@ static int
 InitializeConn(httpd_conn* hc, int cnum)
 {
   hc->hc_maxAccept = hc->hc_maxAccepte = 0;
+  /* It is reallocating the memory as per requirement 
+   * The function is defines in libhttpd.c
+  */
   if (!realloc_str(&hc->hc_accept, &hc->hc_maxAccept, 0))
     return(TRUE);
   if (!realloc_str(&hc->hc_accepte, &hc->hc_maxAccepte, 0))
@@ -221,6 +224,7 @@ AcceptConnections(int cnum, int acceptMany)
     sz = sizeof(sin);
 
     newConnFD = accept(HS.fd, (struct sockaddr*) &sin, &sz);
+    printf("accept %d\n", newConnFD);
     if (newConnFD < 0) {
       return(FALSE);
     }
@@ -232,21 +236,21 @@ AcceptConnections(int cnum, int acceptMany)
       cnum = -1;
       /* Find a free connection entry. */
       for (i = firstFreeConnHint; i < FD_SETSIZE/8; i++) {
-	if (freeConnBits[i]) {
-	  int j = 0;
-	  int val;
-	  val = freeConnBits[i];
-	  while (!(val & 1)) {
-	    val >>=1;
-	    j++;
-	  }
-	  cnum = (i<<3)+j;
-	  firstFreeConnHint = i;
-	  /* clear the appropriate bit later, after
-	     we know there are no errors with the connection */
-	  break;
-	}
-      }
+		if (freeConnBits[i]) {
+		int j = 0;
+		int val;
+		val = freeConnBits[i];
+		while (!(val & 1)) {
+			val >>=1;
+			j++;
+		}
+		cnum = (i<<3)+j;
+		firstFreeConnHint = i;
+		/* clear the appropriate bit later, after
+			we know there are no errors with the connection */
+		break;
+		}
+    }/* End of for loop */
     }
      
     if (cnum == -1) {
@@ -259,13 +263,13 @@ AcceptConnections(int cnum, int acceptMany)
     if (!c) {
       /* allocate and initialize new connections */
       if (AllocateNewConnEntries(cnum)) {
-	/* sending a 500 message at this point is hard,
-	   so just skip it. We don't expect this to occur */
-	close(newConnFD);
-	return(FALSE);
-      }
-      c = allConnects[cnum];
-    }
+		/* sending a 500 message at this point is hard,
+		so just skip it. We don't expect this to occur */
+		close(newConnFD);
+		return(FALSE);
+		}
+		c = allConnects[cnum];
+	}
     
     /* initialize the connection before doing anything else */
     PrepareConnOnAccept(c, newConnFD, &sin);
@@ -273,7 +277,8 @@ AcceptConnections(int cnum, int acceptMany)
     MakeConnFDAssociation(c, c->hc_fd);
 
     freeConnBits[cnum>>3] &= ~(1<<(cnum&7));
-    numConnects++;		/* do this here, since we might
+    numConnects++;		
+    /* do this here, since we might
 				   close the connection when reading */
     /* although this read might seem unnecessary because of the
        optimistic write after the regular read in the main loop, it

@@ -73,7 +73,7 @@ typedef struct CacheEntry {
   char *ce_filename;		
   struct CacheEntry *ce_nextInHash;
   struct CacheEntry **ce_prevInHash;
-  struct CacheEntry *ce_nextInLRU; /* not impl */
+  struct CacheEntry *ce_nextInLRU; 					/* not impl */
   int ce_size;
   int ce_numRefs;
   int ce_isInvalid;
@@ -82,14 +82,14 @@ typedef struct CacheEntry {
   int ce_numChunksInMem;
   struct ReadInfoRec *ce_dataChunks;	
   time_t ce_lastValidation;	
-  char *ce_encodings;		/* from figure_mime call */
-  char *ce_type;		/* from figure_mime call */
-  time_t ce_modTime;
-  char *ce_respHeader;	/* memory allocated for mime */
+  char *ce_encodings;								/* from figure_mime call */
+  char *ce_type;									/* from figure_mime call */
+  time_t ce_modTime;								/* Time since last modification */
+  char *ce_respHeader;								/* memory allocated for mime */
   int ce_respHeaderLen;
-  time_t ce_respHeaderTime;	/* date field in resp header */
-  char *ce_200Resp;		/* cached response for log */
-  int ce_200RespLen;		/* length of 200 response */
+  time_t ce_respHeaderTime;							/* date field in resp header */
+  char *ce_200Resp;									/* cached response for log */
+  int ce_200RespLen;								/* length of 200 response */
 } CacheEntry;
 
 void *GetDataToSend(struct CacheEntry *ent, int position, int desiredSize, 

@@ -187,7 +187,7 @@ accordance with the requirements of that license:
 ** initializing.  If this user (or the one specified by the -u flag) does
 ** not exist, the program will refuse to run.
 */
-#define DEFAULT_USER "root"
+#define DEFAULT_USER "jazz"
 
 /* CONFIGURE: When started as root, the program can automatically chdir()
 ** to the home directory of the user specified by -u or DEFAULT_USER.
@@ -212,7 +212,7 @@ accordance with the requirements of that license:
 /* CONFIGURE: The default port to listen on.  80 is the standard HTTP port.
 */
 #ifndef DEFAULT_PORTSTR
-#define DEFAULT_PORTSTR "80"
+#define DEFAULT_PORTSTR "18000"
 #endif
 
 /* CONFIGURE: The filename to use for index files.  This should really be a

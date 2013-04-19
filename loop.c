@@ -127,7 +127,8 @@ PrintMainStats(void)
   double temp;
   double temp2;
   struct rusage usageInfo;
-
+  
+  puts("139");
   if (doQueueLenDumps) {
     fprintf(stderr, "\n");
     DumpDataCacheStats();
@@ -136,7 +137,7 @@ PrintMainStats(void)
 
   if (!doMainStats)
     return;
-
+  
   fprintf(stderr, "\n");
   fprintf(stderr, "accepts: %d\n", mainStats.cs_numAccepts);
   fprintf(stderr, "requests: %d\n", mainStats.cs_numRequests);
@@ -257,7 +258,6 @@ ReenableNewClients(void)
 void 
 MainLoop(void)
 {
-	puts("Just checking");
   fd_set rfdset;
   fd_set wfdset;
   int r;
@@ -280,8 +280,8 @@ MainLoop(void)
   numConnects = 0;
 
   /* Main loop. */
-  for (;;) {
-
+  for (;;) 
+  {
     /* check timers _before_ copying rd/wr sets, 
        since a connection timing out shouldn't
        be included in the sets sent to select */
@@ -292,26 +292,32 @@ MainLoop(void)
     memcpy(&rfdset, &masterReadFDSet, sizeof(rfdset));
     memcpy(&wfdset, &masterWriteFDSet, sizeof(wfdset));
 
-#ifdef __linux__
-    selectTimeout.tv_sec = 1;
-    selectTimeout.tv_usec = 0;
-#endif
+/* So, we are resetting the value everytime, only in case of linux */
+	#ifdef __linux__
+		selectTimeout.tv_sec = 1;
+		selectTimeout.tv_usec = 0;
+	#endif
 
     /* Do the select. */
     r = select(highestFDInvolvedWithRW+1, 
 	       &rfdset, &wfdset, NULL, &selectTimeout);
 
     gettimeofday(&globalTimeOfDay, (struct timezone*) 0);
-    if (globalTimeOfDay.tv_sec != globalTimeStrVal) {
+    if (globalTimeOfDay.tv_sec != globalTimeStrVal) 
+    {
       globalTimeStrVal = globalTimeOfDay.tv_sec;
       MakeHTTPDate(globalTimeOfDayStr, globalTimeStrVal);
+      /* I have enabled the log file by creating log.txt 
+       * It does nothing as the log is already empty*/
       if (accessLoggingEnabled)
-	FlushAccessLog();
-    }
+		FlushAccessLog();
+    } /* End of if loop */
 
-    if (r < 0) {
+	//printf("r = %d\n", r);
+    if (r < 0) 
+    {
       if (errno == EINTR)
-	continue;	/* try again */
+		continue;	/* try again */
       perror("select");
       fprintf(stderr, "select %d\n", errno);
       exit(1);
@@ -320,10 +326,14 @@ MainLoop(void)
     if (r)
       lastRealSelectTime = globalTimeOfDay.tv_sec;
     
-    if (r == 0) {
-      if (lastRealSelectTime && (globalTimeOfDay.tv_sec - lastRealSelectTime > 2)) {
-	PrintMainStats();
-	lastRealSelectTime = 0;
+    if (r == 0) 
+    {
+      if (lastRealSelectTime && (globalTimeOfDay.tv_sec - lastRealSelectTime > 2)) 
+      {
+		puts("Entering here... yippee! ");
+		PrintMainStats();
+		puts("Entering here as well... yippee! ");
+		lastRealSelectTime = 0;
       }
       continue;			/* No fd's are ready - run the timers. */
     }
@@ -347,27 +357,27 @@ MainLoop(void)
       doWrite = FD_ISSET(i, &wfdset);
       
 
-      if (doRead || doWrite) {
-	int cnum;
-	SelectHandler handler;
-	httpd_conn *tempConn;
+      if (doRead || doWrite) 
+      {
+		int cnum;
+		SelectHandler handler;
+		httpd_conn *tempConn;
 
-	cnum = fdToConnMap[i];
-	handler = allHandlers[i];
-	if (handler == NULL) {
-	  fprintf(stderr, "got badness in rw loop - conn %d\n", i);
-	  exit(-1);
-	}
-	if (doRead)
-	  r--;
-	if (doWrite)
-	  r--;
-	if (cnum < 0)
-	  tempConn = NULL;
-	else
-	  tempConn = allConnects[cnum];
-	handler(tempConn, i, 
-		((doRead) ? SSH_READ : 0) | ((doWrite) ? SSH_WRITE : 0));
+		cnum = fdToConnMap[i];
+		handler = allHandlers[i];
+		if (handler == NULL) {
+		fprintf(stderr, "got badness in rw loop - conn %d\n", i);
+		exit(-1);
+		}
+		if (doRead)
+			r--;
+		if (doWrite)
+			r--;
+		if (cnum < 0)
+			tempConn = NULL;
+		else
+			tempConn = allConnects[cnum];
+		handler(tempConn, i, ((doRead) ? SSH_READ : 0) | ((doWrite) ? SSH_WRITE : 0));
       }
     }
 
@@ -377,9 +387,11 @@ MainLoop(void)
     }
 
     if (!newClientsDisallowed) {
+	  puts(" If this prints, I am succesful");
+      //AcceptConnections(-1, TRUE);
       AcceptConnections(-1, TRUE);
     }
-  }
+  } /* End of for loop is here */
 }
 /* ---------------------------------------------------------------- */
 static SRCode
@@ -549,6 +561,7 @@ FlushAccessLog(void)
 {
   if (!logHoldBufUsed)
     return;
+  
   write(accessLogFD, logHoldBuf, logHoldBufUsed);
   logHoldBufUsed = 0;
 }

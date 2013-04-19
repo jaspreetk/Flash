@@ -115,26 +115,26 @@ typedef struct httpd_conn
   struct HeaderInfoStruct *hc_headerInfo;
   struct CGIInfo *hc_cgiInfo;
   struct CacheEntry *hc_cacheEnt;
-  struct DirStageBuf *hc_dsb;	/* staging buf for doing 'ls' */
+  struct DirStageBuf *hc_dsb;					/* staging buf for doing 'ls' */
   long hc_expirationTime;
   TimerFunc *hc_expireFunc;
-  long hc_timerPrivate;		/* to be used by the TimerFunc if it wants */
+  long hc_timerPrivate;							/* to be used by the TimerFunc if it wants */
   long hc_sndbuf;
   off_t hc_bytesSent;
-  int hc_numChunkLocks;		/* have we set a chunk lock? */
+  int hc_numChunkLocks;							/* have we set a chunk lock? */
   
-  struct httpd_conn *hc_siblings; /* used in convert */
-  struct httpd_conn *hc_next;	/* used in convert */
-  char *hc_stripped;		/* used in convert */
-  int hc_asyncByteRead;		/* used in async reading */
-  int hc_asyncReadLen;		/* used in async reading */
-  int hc_nagleOff;		/* has nagle been turned off already */
+  struct httpd_conn *hc_siblings; 				/* used in convert */
+  struct httpd_conn *hc_next;					/* used in convert */
+  char *hc_stripped;							/* used in convert */
+  int hc_asyncByteRead;							/* used in async reading */
+  int hc_asyncReadLen;							/* used in async reading */
+  int hc_nagleOff;								/* has nagle been turned off already */
 
-  char *hc_origFirstLine;	/* text of first line sent by client */
-  int hc_origFirstLineLen;	/* length of first line text */
-  int hc_maxOrigFirstLine;	/* size of buffer holding first line */
-  int hc_neededDiskRead;	/* set on per-req basis if read needed */
-  int hc_hadMincoreMisses;	/* set on per-req basis if mincore failed */
+  char *hc_origFirstLine;						/* text of first line sent by client */
+  int hc_origFirstLineLen;						/* length of first line text */
+  int hc_maxOrigFirstLine;						/* size of buffer holding first line */
+  int hc_neededDiskRead;						/* set on per-req basis if read needed */
+  int hc_hadMincoreMisses;						/* set on per-req basis if mincore failed */
 } httpd_conn;
 
 /* keep these numbered from zero, in order of frequency */
